@@ -1,6 +1,8 @@
 from glob import glob 
 import cv2
 from os.path import join, basename, splitext
+import re
+import struct
 
 class Dmed():
     def __init__(self, dirIn):
@@ -54,9 +56,19 @@ class Dmed():
         onCol = []
         try:
             metaFile = self.baseDir +'/' + self.data[id]+ self.metaExt
-            # fMeta = 
-            return onRow, onCol
+            fMeta = open(metaFile, "r")
+            res = fMeta.read()
+            fMeta.close()
+            tokRow = re.search('ONrow\W+([0-9\.]+)', res)
+            tokCol = re.search('ONcol\W+([0-9\.]+)', res)
+            
+            if  tokRow and tokCol:
+                onRow = int(tokRow.group().split('~')[1])
+                onCol = int(tokCol.group().split('~')[1])
+
         except:
-            print('Index exceeds dataset size of ' + str(self.imgNum) )
+            print('Location not Found, exceeds image size')
+
+        return onRow, onCol
         
     

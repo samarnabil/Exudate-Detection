@@ -4,7 +4,8 @@ def exDetect( rgbImgOrig, removeON, onY, onX ):
     showRes = 0;  # show lesions in image
     imgProb = getLesions( rgbImgOrig, showRes, removeON, onY, onX )
 
-    return imgProb,'Tesssst'
+    return imgProb
 
 def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
+    # All algorithm functions
     pass

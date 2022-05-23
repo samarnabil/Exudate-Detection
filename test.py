@@ -17,22 +17,23 @@ if __name__ == '__main__':
     #  The location of the dataset
     DMEDloc = './DMED'
     data = Dmed( os.path.abspath(DMEDloc) )
-    # print(os.path.abspath(DMEDloc))
 
     for i in range(0,data.getNumOfImgs()):
+        # 1. get Image
         rgbImg = data.getImg(i)
         resizedImg = cv2.resize(rgbImg, scaleIm(rgbImg,20), interpolation = cv2.INTER_AREA)
         
-        # 1. get optic nerve location
+        # 2. get optic nerve location
         [onY, onX] = data.getONloc(i)
-        # 2. segment exudates
+
+        # 3. segment exudates
         imgProb = exDetect( rgbImg, 1, onY, onX )
-        print(imgProb)
+        # print(imgProb)
         
-        # display results
+        # 4. display results
         cv2.imshow('image',resizedImg)
 
-        # % block execution up until an image is closed
+        # block execution up until an image is closed
         k = cv2.waitKey(0)
         # wait for ESC key to exit
         if k == 27:
