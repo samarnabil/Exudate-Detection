@@ -4,6 +4,8 @@ from os.path import join, basename, splitext
 import re
 import struct
 
+from cv2 import IMREAD_UNCHANGED
+
 class Dmed():
     def __init__(self, dirIn):
         # set constants
@@ -41,7 +43,8 @@ class Dmed():
     def getImg (self,id): 
         try:
             imgAddress = self.baseDir +'/' + self.data[id]+ self.imgExt
-            img = cv2.imread( imgAddress )
+            img = cv2.imread( imgAddress , cv2.IMREAD_UNCHANGED)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         except:
             img = []
             print('Index exceeds dataset size of ' + str(self.imgNum) )

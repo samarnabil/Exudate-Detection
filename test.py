@@ -6,10 +6,21 @@ from misc.Dmed import Dmed;
 from exDetect import *;
 
 
-def scaleIm (img,scale_percent):
-    width = int(img.shape[1] * scale_percent / 100)
-    height = int(img.shape[0] * scale_percent / 100)
-    return (width, height)
+def scaleIm (img):
+    # width = int(img.shape[1] * scale_percent / 100)
+    # height = int(img.shape[0] * scale_percent / 100)
+    # return (width, height)
+
+    origSize = img.shape
+    newSize = np.array([750, round(750*(origSize[1]/origSize[0]))])
+
+    maxWavDecom = 2
+
+    pxToAddC = 2**maxWavDecom - (newSize[1] % (2**maxWavDecom))
+    pxToAddR = 2**maxWavDecom - (newSize[0] % (2**maxWavDecom))
+    sizeOut = newSize + [pxToAddR, pxToAddC]
+
+    return cv2.resize(img, tuple(reversed(sizeOut))) 
 
 
 if __name__ == '__main__':
@@ -21,7 +32,7 @@ if __name__ == '__main__':
     for i in range(0,data.getNumOfImgs()):
         # 1. get Image
         rgbImg = data.getImg(i)
-        resizedImg = cv2.resize(rgbImg, scaleIm(rgbImg,20), interpolation = cv2.INTER_AREA)
+        resizedImg = scaleIm(rgbImg)
         
         # 2. get optic nerve location
         [onY, onX] = data.getONloc(i)
@@ -31,7 +42,8 @@ if __name__ == '__main__':
         # print(imgProb)
         
         # 4. display results
-        cv2.imshow('image',resizedImg)
+        imgShow = cv2.cvtColor(resizedImg, cv2.COLOR_BGR2RGB)
+        cv2.imshow('image',imgShow)
 
         # block execution up until an image is closed
         k = cv2.waitKey(0)
