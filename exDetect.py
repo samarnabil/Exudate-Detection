@@ -8,9 +8,10 @@ def exDetect( rgbImgOrig, removeON, onY, onX ):
     showRes = 0;  # show lesions in image
     imgProb = getLesions( rgbImgOrig, showRes, removeON, onY, onX )
 
-    rgbImgOrig = cv2.imread("1.jpg")
-    #print (type(rgbImgOrig))
-    print(rgbImgOrig.shape)
+    return imgProb
+
+def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
+    # All algorithm functions
 
     # Resize :part of exdetect function befire call kirsch fun
 
@@ -30,20 +31,15 @@ def exDetect( rgbImgOrig, removeON, onY, onX ):
 
     #change colour plane
     imgHSV = cv2.cvtColor(imgRGB, cv2.COLOR_RGB2HSV)
-    imgV = imgHSV[:,:,3]
+    imgV = imgHSV[:,:,2]
     imgV8 = np.int8(imgV*255)
 
     #Create FOV mask
-    imgFovMask = getFovMask(imgV8, 1, 30 )
+    #imgFovMask = getFovMask(imgV8, 1, 30 )
 
     #Calculate edge strength of lesions
     imgKirsch = kirschEdges(imgG)
 
-
-    return imgProb
-
-def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
-    # All algorithm functions
     pass
 
 def findGoodResolutionForWavelet(sizeIn):
