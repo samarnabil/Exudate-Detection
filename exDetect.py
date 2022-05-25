@@ -1,5 +1,6 @@
 import cv2
-import numpy as np # For numeric computing, setting up matrices and performing computations at them
+import numpy as np
+import scipy # For numeric computing, setting up matrices and performing computations at them
 from skimage.color import rgb2hsv
 from misc.getFovMask import getFovMask
 from misc.kirschEdges import kirschEdges
@@ -22,7 +23,7 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
    
     # resize image to become as newsize 
     # reverse newsize bc it takes new width and height, not the new height and the width and tuple to convert numpy array to tuple
-    imgRGB = cv2.resize(rgbImgOrig, tuple(reversed(newSize))) 
+    imgRGB = cv2.resize(rgbImgOrig, tuple(reversed(newSize)),interpolation=cv2.INTER_CUBIC) 
     
     # Green channel
     imgG = imgRGB[:,:,1]
@@ -53,17 +54,46 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
 
     #Create FOV mask
     imgFovMask = getFovMask(imgV8, 1, 30 )
-    imgFovMask[winOnCoordY[0]:winOnCoordY[1], winOnCoordX[0]:winOnCoordX[1]] = 0
+    imgFovMask[int(winOnCoordY[0]):int(winOnCoordY[1]), int(winOnCoordX[0]):int(winOnCoordX[1])] = 0
     # cv2.imshow('image',np.uint8(imgFovMask)*255)
     # k = cv2.waitKey(0)
 
     # --- start line 120
 
     #Calculate edge strength of lesions
-    # imgKirsch = kirschEdges(imgG)
+    #fixed threshold using median Background (with reconstruction)
 
-    # return imgV8.shape
+    kernelSize = int(round(newSize[0]/30))
+    medBg = np.array(scipy.signal.medfilt2d (np.array(imgV8,np.float),[kernelSize,kernelSize]),np.float)
+    #cv2.imshow('median filter',medBg)
+    #reconstruct bg
+    maskImg = np.array(imgV8,np.float)
+    pxLbl = maskImg < medBg
+    pxLbl= pxLbl.astype(int)
+    maskImg[pxLbl] = medBg[pxLbl]
+    
 
+
+    #subtract, remove fovMask and threshold
+
+    #subImg = np.array(imgV8,np.float) - np.array(medRestored,np.float)
+    #subImg = subImg * np.array(imgFovMask,np.float)
+
+
+    #Calculate edge strength of lesions
+
+    imgKirsch = kirschEdges( imgG )
+    #cv2.imshow('KirschEdges Output',imgKirsch)
+    #img0 = imgG * uint8(imgThNoOD == 0)
+    #img0recon = imreconstruct(img0, imgG)
+    #img0Kirsch = kirschEdges(img0recon)
+    #imgEdgeNoMask = imgKirsch - img0Kirsch; #edge strength map
+    
+    #remove mask and ON (leave vessels)
+    #imgEdge = np.array(imgFovMask,np.float) * imgEdgeNoMask
+    
+
+    
 def findGoodResolutionForWavelet(sizeIn):
     maxWavDecom = 2
 

@@ -31,5 +31,5 @@ def getFovMask(gImg, erodeFlag, seSize):
         # cv2.imshow('image',np.uint8(fovMask.astype(int)*255))
         # k = cv2.waitKey(0)
 
-    return fovMask
+    return fovMask.astype(int)
         
