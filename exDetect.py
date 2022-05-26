@@ -5,6 +5,10 @@ from skimage.color import rgb2hsv
 from misc.getFovMask import getFovMask
 from misc.kirschEdges import kirschEdges
 
+from scipy.signal import medfilt2d
+from skimage.morphology import reconstruction
+from skimage.measure import label, regionprops
+
 def exDetect( rgbImgOrig, removeON, onY, onX ):
     #  Parameters
     showRes = 0;  # show lesions in image
@@ -63,14 +67,14 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     #Calculate edge strength of lesions
     #fixed threshold using median Background (with reconstruction)
 
-    kernelSize = int(round(newSize[0]/30))
-    medBg = np.array(scipy.signal.medfilt2d (np.array(imgV8,np.float),[kernelSize,kernelSize]),np.float)
-    #cv2.imshow('median filter',medBg)
-    #reconstruct bg
-    maskImg = np.array(imgV8,np.float)
-    pxLbl = maskImg < medBg
-    pxLbl= pxLbl.astype(int)
-    maskImg[pxLbl] = medBg[pxLbl]
+    # kernelSize = int(round(newSize[0]/30))
+    # medBg = np.array(scipy.signal.medfilt2d (np.array(imgV8,np.float),[kernelSize,kernelSize]),np.float)
+    # #cv2.imshow('median filter',medBg)
+    # #reconstruct bg
+    # maskImg = np.array(imgV8,np.float)
+    # pxLbl = maskImg < medBg
+    # pxLbl= pxLbl.astype(int)
+    # maskImg[pxLbl] = medBg[pxLbl]
     
 
 
@@ -82,7 +86,7 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
 
     #Calculate edge strength of lesions
 
-    imgKirsch = kirschEdges( imgG )
+    # imgKirsch = kirschEdges( imgG )
     #cv2.imshow('KirschEdges Output',imgKirsch)
     #img0 = imgG * uint8(imgThNoOD == 0)
     #img0recon = imreconstruct(img0, imgG)
@@ -91,7 +95,49 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     
     #remove mask and ON (leave vessels)
     #imgEdge = np.array(imgFovMask,np.float) * imgEdgeNoMask
+
+
+    #########################################
+
+    kernel_size = round(newSize[0]/30)
+    medBg = medfilt2d(np.array(imgV8, np.float), [kernel_size, kernel_size])    
+    # reconstruct bg
+    maskImg = np.array(imgV8, np.float)
+    pxLbl = maskImg < medBg
+    maskImg[pxLbl] = medBg[pxLbl]
+
+    medRestored = reconstruction(medBg, maskImg)
+    # subtract, remove fovMask and threshold
+    subImg = np.array(imgV8, np.float) - np.array(medRestored, np.float) 
+    subImg = np.multiply(subImg , np.array(imgFovMask, np.float))
+    subImg[subImg < 0] = 0
+    imgThNoOD = np.uint8(subImg) > 0
+
+    #Calculate edge strength of lesions
+    imgKirsch = kirschEdges(imgG)
+    img0 = np.multiply(imgG, np.uint8(imgThNoOD == 0))
+    img0recon = reconstruction(img0, imgG)
+    img0Kirsch = kirschEdges(img0recon)
+    imgEdgeNoMask = imgKirsch - img0Kirsch # edge strength map
+
+    # remove mask and ON (leave vessels)
+    imgEdge = np.multiply(np.array(imgFovMask, np.float), imgEdgeNoMask)
+
+    # Calculate edge strength for each lesion candidate (Matlab2008)
+    lesCandImg = np.zeros(newSize)
+    lblImg = label(imgThNoOD,connectivity=2)
+    lesCand = regionprops(lblImg)
+    for idxLes in range (0,len(lesCand)):
+        pxIdxList = lesCand[idxLes].coords
+        lesCandImg[pxIdxList[:,0] , pxIdxList[:,1]] = np.sum(imgEdge[pxIdxList[:,0], pxIdxList[:,1]]) / len(pxIdxList)
     
+    cv2.imshow('image',(lesCandImg))
+    k = cv2.waitKey(0)
+    
+    # resize back
+    # ResizedImg = cv2.resize(lesCandImg, origSize[0:2], cv2.INTER_NEAREST)
+    # img_uint8 = np.uint8(lesCandImg)
+    # imgShow = cv2.cvtColor(lesCandImg, cv2.COLOR_BGR2RGB)
 
     
 def findGoodResolutionForWavelet(sizeIn):
