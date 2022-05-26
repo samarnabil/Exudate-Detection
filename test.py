@@ -32,21 +32,12 @@ if __name__ == '__main__':
     for i in range(0,data.getNumOfImgs()):
         # 1. get Image
         rgbImg = data.getImg(i)
-        resizedImg = scaleIm(rgbImg)
         
         # 2. get optic nerve location
         [onY, onX] = data.getONloc(i)
 
         # 3. segment exudates
         imgProb = exDetect( rgbImg, 1, onY, onX )
-        # print(imgProb)
         
         # 4. display results
-        imgShow = cv2.cvtColor(resizedImg, cv2.COLOR_BGR2RGB)
-        cv2.imshow('image',imgShow)
-
-        # block execution up until an image is closed
-        k = cv2.waitKey(0)
-        # wait for ESC key to exit
-        if k == 27:
-            cv2.destroyAllWindows()
+        show_results(rgbImg, imgProb)
