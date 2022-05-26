@@ -4,7 +4,6 @@ import scipy # For numeric computing, setting up matrices and performing computa
 from skimage.color import rgb2hsv
 from misc.getFovMask import getFovMask
 from misc.kirschEdges import kirschEdges
-
 from scipy.signal import medfilt2d
 from skimage.morphology import reconstruction
 from skimage.measure import label, regionprops
@@ -12,6 +11,17 @@ from matplotlib.colors import LinearSegmentedColormap
 import matplotlib.pyplot as plt
 
 def exDetect( rgbImgOrig, removeON, onY, onX ):
+    """
+    Reads optical nerve location for meta file
+    _________
+    Arguments:
+        rgbImgOrig: Fundus Image
+        removeON: an integer, acts as flag for removing optical nerve location
+        onY: horizontal coordinate of optical nerve - row
+        onX: vertical coordinate of optical nerve - col
+    Returns: 
+        imgProb:  Inner Lesion Map 
+    """
     #  Parameters
     showRes = 0;  # show lesions in image
     imgProb = getLesions( rgbImgOrig, showRes, removeON, onY, onX )
@@ -61,46 +71,9 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     #Create FOV mask
     imgFovMask = getFovMask(imgV8, 1, 30 )
     imgFovMask[int(winOnCoordY[0]):int(winOnCoordY[1]), int(winOnCoordX[0]):int(winOnCoordX[1])] = 0
-    # cv2.imshow('image',np.uint8(imgFovMask)*255)
-    # k = cv2.waitKey(0)
-
-    # --- start line 120
 
     #Calculate edge strength of lesions
-    #fixed threshold using median Background (with reconstruction)
-
-    # kernelSize = int(round(newSize[0]/30))
-    # medBg = np.array(scipy.signal.medfilt2d (np.array(imgV8,np.float),[kernelSize,kernelSize]),np.float)
-    # #cv2.imshow('median filter',medBg)
-    # #reconstruct bg
-    # maskImg = np.array(imgV8,np.float)
-    # pxLbl = maskImg < medBg
-    # pxLbl= pxLbl.astype(int)
-    # maskImg[pxLbl] = medBg[pxLbl]
-    
-
-
-    #subtract, remove fovMask and threshold
-
-    #subImg = np.array(imgV8,np.float) - np.array(medRestored,np.float)
-    #subImg = subImg * np.array(imgFovMask,np.float)
-
-
-    #Calculate edge strength of lesions
-
-    # imgKirsch = kirschEdges( imgG )
-    #cv2.imshow('KirschEdges Output',imgKirsch)
-    #img0 = imgG * uint8(imgThNoOD == 0)
-    #img0recon = imreconstruct(img0, imgG)
-    #img0Kirsch = kirschEdges(img0recon)
-    #imgEdgeNoMask = imgKirsch - img0Kirsch; #edge strength map
-    
-    #remove mask and ON (leave vessels)
-    #imgEdge = np.array(imgFovMask,np.float) * imgEdgeNoMask
-
-
-    #########################################
-
+    # Estimate the background with a large median filter, whose size is 1/30 the height of the fundus image
     kernel_size = round(newSize[0]/30)
     medBg = medfilt2d(np.array(imgV8, np.float), [kernel_size, kernel_size])    
     # reconstruct bg
@@ -168,7 +141,7 @@ def show_results(org_img, seg_img):
     # showing Original Image
     plt.imshow(org_img)
     plt.axis('off')
-    plt.title("Original Image")
+    plt.title("Original Fundus Image")
     
     # Adds a subplot at the 2nd position
     fig.add_subplot(rows, columns, 2)
@@ -177,9 +150,10 @@ def show_results(org_img, seg_img):
     parula_map = colormap_data()
     plt.imshow(seg_img, cmap=parula_map)
     plt.axis('off')
-    plt.title("Segment Exudates")
+    plt.title("Inner Lesion Map ")
 
     plt.show()
+
 
 
 def colormap_data():

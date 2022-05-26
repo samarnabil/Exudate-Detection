@@ -1,26 +1,8 @@
 # Uses python3
-import sys;
 import os;
-import cv2;
+import keyboard;
 from misc.Dmed import Dmed;
 from exDetect import *;
-
-
-def scaleIm (img):
-    # width = int(img.shape[1] * scale_percent / 100)
-    # height = int(img.shape[0] * scale_percent / 100)
-    # return (width, height)
-
-    origSize = img.shape
-    newSize = np.array([750, round(750*(origSize[1]/origSize[0]))])
-
-    maxWavDecom = 2
-
-    pxToAddC = 2**maxWavDecom - (newSize[1] % (2**maxWavDecom))
-    pxToAddR = 2**maxWavDecom - (newSize[0] % (2**maxWavDecom))
-    sizeOut = newSize + [pxToAddR, pxToAddC]
-
-    return cv2.resize(img, tuple(reversed(sizeOut))) 
 
 
 if __name__ == '__main__':
@@ -41,3 +23,7 @@ if __name__ == '__main__':
         
         # 4. display results
         show_results(rgbImg, imgProb)
+
+        if keyboard.is_pressed('q'):  # if key 'q' is pressed 
+            print('Quit the Loop!')
+            break  # finishing the loop
