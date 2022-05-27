@@ -153,7 +153,7 @@ You need to install these libraries:
     Arguments:
         org_img: Original fundus Image
         seg_img: Segmented exudates
-  """
+    """
   ```
   5. colormap_data
   ```python
@@ -201,8 +201,8 @@ You need to install these libraries:
 ## Contact
 
 * Samar Nabil - samarnabil22@gmail.com 
-* Yomna Sabah - 
-* Menna Kamel
+* Yomna Sabah - yomnasabah07@gmail.com
+* Menna Kamel - menna.nawar@gmail.com
 
 Project Link: [https://github.com/samarnabil/Exudate-Detection](https://github.com/samarnabil/Exudate-Detection)
 
