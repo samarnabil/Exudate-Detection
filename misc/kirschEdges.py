@@ -3,6 +3,15 @@ import numpy as np # For numeric computing, setting up matrices and performing c
 
 def kirschEdges(imgIn):
 
+    """
+    Calculate the edge map using Spatial Filtering by Kirsch's Templates
+    _________
+    Arguments:
+        imgIn: green chanel of input image 
+    Returns: 
+        imgOut: edge map which contains maximum edges value
+    """
+
     h1 = np.array([[5, -3, -3],[5, 0, -3],[5, -3, -3]])/15
     h2 = np.array([[-3, -3, 5],[-3, 0, 5],[-3, -3, 5]])/15
     h3 = np.array([[-3, -3, -3],[5, 0, -3],[5, 5, -3]])/15

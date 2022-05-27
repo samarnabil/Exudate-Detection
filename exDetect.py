@@ -30,16 +30,32 @@ def exDetect( rgbImgOrig, removeON, onY, onX ):
 
 def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
 
+    """
+    1.Resize the original fundus image
+    2.Extract the green channel image
+    3.Find field of view mask from the image's HSI colour space
+    4.Estimate the background with a large median filter
+    5.Perform a morphological reconstruction of an image by dilation
+    6.Capture the external edges of the lesion candidates by Kirsch’s Edges
+    _________
+    Arguments:
+        rgbImgOrig: Fundus Image
+        showRes: A flag set to zero 
+        removeON: an integer, acts as flag for removing optical nerve location
+        onY: horizontal coordinate of optical nerve - row
+        onX: vertical coordinate of optical nerve - col
+    Returns: 
+        lesCandImg:  Inner Lesion Map
+    """
+
     # Resize :part of exdetect function befire call kirsch fun
     origSize = rgbImgOrig.shape
     newSize = np.array([750, round(750*(origSize[1]/origSize[0]))])
- 
-    #newSize = newSize-mod(newSize,2); # force the size to be even
     newSize = findGoodResolutionForWavelet(newSize)
    
     # resize image to become as newsize 
     # reverse newsize bc it takes new width and height, not the new height and the width and tuple to convert numpy array to tuple
-    imgRGB = cv2.resize(rgbImgOrig, tuple(reversed(newSize)),interpolation=cv2.INTER_CUBIC) 
+    imgRGB = cv2.resize(rgbImgOrig, tuple(reversed(newSize)),interpolation=cv2.INTER_AREA) 
     
     # Green channel
     imgG = imgRGB[:,:,1]
@@ -75,7 +91,7 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     #Calculate edge strength of lesions
     # Estimate the background with a large median filter, whose size is 1/30 the height of the fundus image
     kernel_size = round(newSize[0]/30)
-    medBg = medfilt2d(np.array(imgV8, np.float), [kernel_size, kernel_size])    
+    medBg = medfilt2d(np.array(imgV8, np.float), [int(kernel_size), int(kernel_size)])    
     # reconstruct bg
     maskImg = np.array(imgV8, np.float)
     pxLbl = maskImg < medBg
@@ -112,13 +128,21 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     dim = (width, height)
     lesCandImg = cv2.resize(lesCandImg, dim, cv2.INTER_NEAREST)
 
-    if(showRes):
-        show_results(rgbImgOrig, lesCandImg)
+    #if(showRes):
+        #show_results(rgbImgOrig, lesCandImg)
     
     return lesCandImg
 
     
 def findGoodResolutionForWavelet(sizeIn):
+    """
+    calculate new size of image to resize the image to a height of 752 pixels maintaining the original height/width ratio
+    _________
+    Arguments:
+        sizeIn: Fundus Image size
+    Returns: 
+        sizeOut: new size
+    """
     maxWavDecom = 2
 
     pxToAddC = 2**maxWavDecom - (sizeIn[1] % (2**maxWavDecom))
@@ -128,6 +152,13 @@ def findGoodResolutionForWavelet(sizeIn):
     return (sizeOut)
 
 def show_results(org_img, seg_img):
+    """
+    Show original image beside its segmented exudates
+    _________
+    Arguments:
+        org_img: Original fundus Image
+        seg_img: Segmented exudates
+    """
 
     fig = plt.figure(figsize=(10, 7))
   
@@ -157,6 +188,15 @@ def show_results(org_img, seg_img):
 
 
 def colormap_data():
+
+    """
+    Create colormap
+    _________
+
+    Returns: 
+        parula_map: Linear segmented colormap
+    """
+
     cm_data = [[0.2422, 0.1504, 0.6603],
                 [0.2444, 0.1534, 0.6728],
                 [0.2464, 0.1569, 0.6847],
