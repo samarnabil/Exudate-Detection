@@ -51,9 +51,7 @@ You need to install these libraries:
 2. Run [tesy.py](test.py)
 3. Wait for the figure window.
 4. Press 'close' key to proceed to next image.
-    ![My Image](./image-readme/arrow.png)
 5. To quit the program, press 'q' key from keyboard.
-    ![My Image](./image-readme/key.png)
 
 &nbsp;
 ## The following methods are available
@@ -67,7 +65,7 @@ You need to install these libraries:
       _________
       Returns: 
           number of images
-        """
+      """
   ```
   2. getImg
   ```python
@@ -193,7 +191,8 @@ You need to install these libraries:
     Arguments:
         imgIn: green chanel of input image 
     Returns: 
-        imgOut: edge map which contains maximum edges value -->
+        imgOut: edge map which contains maximum edges value
+    """
   ```
 
 
