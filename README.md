@@ -49,7 +49,7 @@ You need to install these libraries:
 ## Usage
 
 1. Open the project with your editor of choice.
-2. Run tesy.py 
+2. Run [tesy.py](test.py)
 3. Wait for the figure window.
 4. Press 'close' key to proceed to next image.
     ![My Image](./image-readme/arrow.png)
@@ -63,9 +63,9 @@ You need to install these libraries:
 &nbsp;
 ## Contact
 
-Samar Nabil - samarnabil22@gmail.com 
-Yomna Sabah - 
-Menna Kamel
+* Samar Nabil - samarnabil22@gmail.com 
+* Yomna Sabah - 
+* Menna Kamel
 
 Project Link: [https://github.com/samarnabil/Exudate-Detection](https://github.com/samarnabil/Exudate-Detection)
 
