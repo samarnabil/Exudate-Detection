@@ -1,4 +1,4 @@
-## About The Project
+# About The Project
 
 ![My Image](./image-readme/app.png)
 
@@ -53,7 +53,7 @@ You need to install these libraries:
 3. Wait for the figure window.
 4. Press 'close' key to proceed to next image.
     ![My Image](./image-readme/arrow.png)
-5. To quit the program, press 'q'.
+5. To quit the program, press 'q' key from keyboard.
     ![My Image](./image-readme/key.png)
 
 &nbsp;
