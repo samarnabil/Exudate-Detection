@@ -160,7 +160,7 @@ def show_results(org_img, seg_img):
         seg_img: Segmented exudates
     """
 
-    fig = plt.figure(figsize=(10, 7))
+    fig = plt.figure('Exudate Detection',figsize=(10, 7))
   
     # setting values to rows and column variables
     rows = 1
