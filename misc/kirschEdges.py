@@ -2,7 +2,6 @@ from scipy import signal
 import numpy as np # For numeric computing, setting up matrices and performing computations at them
 
 def kirschEdges(imgIn):
-
     """
     Calculate the edge map using Spatial Filtering by Kirsch's Templates
     _________

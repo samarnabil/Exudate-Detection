@@ -188,7 +188,6 @@ def show_results(org_img, seg_img):
 
 
 def colormap_data():
-
     """
     Create colormap
     _________
