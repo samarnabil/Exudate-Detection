@@ -84,11 +84,12 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
         if(winOnCoordY[1] > newSize[0]): winOnCoordY[1] = newSize[0]
         if(winOnCoordX[1] > newSize[1]): winOnCoordX[1] = newSize[1]
 
-    #Create FOV mask
+    # Create FOV mask
     imgFovMask = getFovMask(imgV8, 1, 30 )
     imgFovMask[int(winOnCoordY[0]):int(winOnCoordY[1]), int(winOnCoordX[0]):int(winOnCoordX[1])] = 0
 
-    #Calculate edge strength of lesions
+    # Fixed threshold using median Background (with reconstruction)
+
     # Estimate the background with a large median filter, whose size is 1/30 the height of the fundus image
     kernel_size = round(newSize[0]/30)
     medBg = medfilt2d(np.array(imgV8, np.float), [int(kernel_size), int(kernel_size)])    
@@ -96,15 +97,15 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     maskImg = np.array(imgV8, np.float)
     pxLbl = maskImg < medBg
     maskImg[pxLbl] = medBg[pxLbl]
-
     medRestored = reconstruction(medBg, maskImg)
+
     # subtract, remove fovMask and threshold
     subImg = np.array(imgV8, np.float) - np.array(medRestored, np.float) 
     subImg = np.multiply(subImg , np.array(imgFovMask, np.float))
     subImg[subImg < 0] = 0
     imgThNoOD = np.uint8(subImg) > 0
 
-    #Calculate edge strength of lesions
+    # Calculate edge strength of lesions
     imgKirsch = kirschEdges(imgG)
     img0 = np.multiply(imgG, np.uint8(imgThNoOD == 0))
     img0recon = reconstruction(img0, imgG)
@@ -114,7 +115,7 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     # remove mask and ON (leave vessels)
     imgEdge = np.multiply(np.array(imgFovMask, np.float), imgEdgeNoMask)
 
-    # Calculate edge strength for each lesion candidate (Matlab2008)
+    # Calculate edge strength for each lesion candidate
     lesCandImg = np.zeros(newSize)
     lblImg = label(imgThNoOD,connectivity=2)
     lesCand = regionprops(lblImg)
@@ -127,9 +128,6 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     height = int(origSize[0])
     dim = (width, height)
     lesCandImg = cv2.resize(lesCandImg, dim, cv2.INTER_NEAREST)
-
-    #if(showRes):
-        #show_results(rgbImgOrig, lesCandImg)
     
     return lesCandImg
 
