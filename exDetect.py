@@ -48,7 +48,7 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
         lesCandImg:  Inner Lesion Map
     """
 
-    # Resize :part of exdetect function befire call kirsch fun
+    # Resize :part of exdetect function before call kirsch function
     origSize = rgbImgOrig.shape
     newSize = np.array([750, round(750*(origSize[1]/origSize[0]))])
     newSize = findGoodResolutionForWavelet(newSize)
@@ -66,7 +66,10 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
     imgV8 = np.uint8(imgV*255)
 
     #  Remove OD region
-    #  Parameters
+
+    # Create FOV mask
+    imgFovMask = getFovMask(imgV8, 1, 30 )
+
     winOnRatio = [1/8,1/8]
     if removeON :
         # get ON window
@@ -84,9 +87,7 @@ def getLesions( rgbImgOrig, showRes, removeON, onY, onX ):
         if(winOnCoordY[1] > newSize[0]): winOnCoordY[1] = newSize[0]
         if(winOnCoordX[1] > newSize[1]): winOnCoordX[1] = newSize[1]
 
-    # Create FOV mask
-    imgFovMask = getFovMask(imgV8, 1, 30 )
-    imgFovMask[int(winOnCoordY[0]):int(winOnCoordY[1]), int(winOnCoordX[0]):int(winOnCoordX[1])] = 0
+        imgFovMask[int(winOnCoordY[0]):int(winOnCoordY[1]), int(winOnCoordX[0]):int(winOnCoordX[1])] = 0
 
     # Fixed threshold using median Background (with reconstruction)
 
